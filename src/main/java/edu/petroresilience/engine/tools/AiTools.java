@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -18,7 +19,8 @@ public class AiTools {
         this.repository = repository;
     }
 
-    public record FacilityRequest(String query) {}
+    public record FacilityRequest(String query) {
+    }
 
     @Bean
     @Description("Get real-time information about petroleum facilities, refineries, and storage capacities from the database.")
@@ -32,7 +34,8 @@ public class AiTools {
         };
     }
 
-    public record SanctionRequest(String countryName) {}
+    public record SanctionRequest(String countryName) {
+    }
 
     @Bean
     @Description("Check if a specific country is under international trade sanctions or embargos.")
@@ -47,6 +50,22 @@ public class AiTools {
             } else {
                 return "SUCCESS: " + request.countryName() + " is cleared for trade. No active sanctions found.";
             }
+        };
+    }
+
+    @Bean
+    @Description("Find alternative oil suppliers that have an OPEN maritime route and are NOT under sanctions.")
+    public Supplier<String> findAlternativeSuppliers() {
+        return () -> {
+            System.out.println("🔍 Checking Neo4j for safe suppliers and open sea routes...");
+            List<String> safeCountries = repository.findSafeSuppliersViaOpenRoutes();
+
+            System.out.println("📦 Data from Neo4j: " + safeCountries);
+
+            if (safeCountries.isEmpty()) {
+                return "CRITICAL WARNING: No safe alternative suppliers found. Either all countries are sanctioned, or the maritime routes are CLOSED.";
+            }
+            return "Safe suppliers with open routes found: " + String.join(", ", safeCountries);
         };
     }
 }
