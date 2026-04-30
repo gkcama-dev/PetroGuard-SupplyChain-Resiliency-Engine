@@ -4,6 +4,7 @@ import edu.petroresilience.engine.repository.FacilityRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.List;
 import java.util.function.Function;
@@ -14,9 +15,11 @@ import java.util.stream.Collectors;
 public class AiTools {
 
     private final FacilityRepository repository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public AiTools(FacilityRepository repository) {
+    public AiTools(FacilityRepository repository, SimpMessagingTemplate messagingTemplate) {
         this.repository = repository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public record FacilityRequest(String query) {
@@ -63,8 +66,14 @@ public class AiTools {
             System.out.println("📦 Data from Neo4j: " + safeCountries);
 
             if (safeCountries.isEmpty()) {
+
+                // Emergency incident! Broadcast this live in real time!
+                messagingTemplate.convertAndSend("/topic/alerts", "🔴 CRITICAL ALERT: MARITIME BLOCKADE DETECTED!");
                 return "CRITICAL WARNING: No safe alternative suppliers found. Either all countries are sanctioned, or the maritime routes are CLOSED.";
             }
+
+            // Status is normal! Routes are open and operational.
+            messagingTemplate.convertAndSend("/topic/alerts", "🟢 SYSTEM NORMAL: Safe suppliers available.");
             return "Safe suppliers with open routes found: " + String.join(", ", safeCountries);
         };
     }
