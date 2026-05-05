@@ -20,30 +20,38 @@ public class ApiController {
         this.facilityRepository = facilityRepository;
     }
 
+//    @GetMapping("/suppliers/safe")
+//    public List<Map<String, String>> getSafeSuppliers(){
+//        System.out.println("📡 Frontend requested safe suppliers data...");
+
+    /// /        return facilityRepository.findSafeSuppliersViaOpenRoutes();
+//        return List.of(
+//                Map.of(
+//                        "country", "Saudi Arabia",
+//                        "route", "Strait of Hormuz",
+//                        "cost", "$4.5M",
+//                        "status", "Safe"
+//                ),
+//                Map.of(
+//                        "country", "UAE",
+//                        "route", "Strait of Hormuz",
+//                        "cost", "$2.0M",
+//                        "status", "Safe"
+//                ),
+//                Map.of(
+//                        "country", "Oman",
+//                        "route", "Arabian Sea",
+//                        "cost", "$3.2M",
+//                        "status", "Monitoring"
+//                )
+//        ).reversed();
+//    }
+
     @GetMapping("/suppliers/safe")
-    public List<Map<String, String>> getSafeSuppliers(){
-        System.out.println("📡 Frontend requested safe suppliers data...");
-//        return facilityRepository.findSafeSuppliersViaOpenRoutes();
-        return List.of(
-                Map.of(
-                        "country", "Saudi Arabia",
-                        "route", "Strait of Hormuz",
-                        "cost", "$4.5M",
-                        "status", "Safe"
-                ),
-                Map.of(
-                        "country", "UAE",
-                        "route", "Strait of Hormuz",
-                        "cost", "$2.0M",
-                        "status", "Safe"
-                ),
-                Map.of(
-                        "country", "Oman",
-                        "route", "Arabian Sea",
-                        "cost", "$3.2M",
-                        "status", "Monitoring"
-                )
-        ).reversed();
+    public List<Map<String, Object>> getSafeSuppliers() {
+        System.out.println("📡 Frontend requested safe suppliers data from Neo4j...");
+        
+        return facilityRepository.getSuppliersForFrontend();
     }
 
     @GetMapping("/health")
